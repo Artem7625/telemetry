@@ -1,10 +1,10 @@
 from pydantic import BaseModel, validator
 
 
-class EngineerName(BaseModel):
-    name: str
+class BaseNameValidator:
+    """Класс валидации данных фамилии и инициалов."""
 
-    @validator("name")
+    @classmethod
     def validate_name_format(cls, value):
 
         # Подготовка фамилии и инициалов.
@@ -27,7 +27,7 @@ class EngineerName(BaseModel):
             raise ValueError("Фамилия должна быть в нижнем регистре, кроме первой буквы")
 
         # Проверка формата инициалов.
-        if len(initials) != 3:
+        if len(initials) != 3 and initials[-1] != "":
             raise ValueError("Инициалы должны быть в формате 'И.О.'")
 
         if len(initials[0]) != 1 or len(initials[1]) != 1:
@@ -36,8 +36,17 @@ class EngineerName(BaseModel):
         if not (initials[0].isalpha() and initials[1].isalpha()):
             raise ValueError("Инициалы должны состоять из букв")
 
-
         if not (initials[0].isupper() and initials[1].isupper()):
             raise ValueError("Инициалы должны быть в верхнем регистре")
 
         return value
+
+
+class EngineerName(BaseNameValidator, BaseModel):
+    """Класс, описывающий модель фамилии и инициалов пользователя."""
+
+    name: str
+
+    @validator("name")
+    def validate_name(cls, value):
+        return cls.validate_name_format(value)
