@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET and POST Requests</title>
+</head>
+<body>
+
+    <div>
+        <h2>Информация о пусконаладке</h2>
+        <button id="getData">Получить сервисные данные</button>
+        <pre id="responseData"></pre>
+    </div>
+
+    <div>
+        <h2>Установить имя инженера</h2>
+        <input type="text" id="nameInput" placeholder="Фамилия И.О.">
+        <button id="postData">Отправить</button>
+    </div>
+
+    <script>
+        const getDataButton = document.getElementById("getData");
+        const responseDataDiv = document.getElementById("responseData");
+        const nameInput = document.getElementById("nameInput");
+        const postDataButton = document.getElementById("postData");
+
+        getDataButton.addEventListener("click", async () => {
+            try {
+                const response = await fetch("/service/name", {
+                    method: "GET"
+                });
+                const data = await response.json();
+                responseDataDiv.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                responseDataDiv.textContent = "Error occurred: " + error.message;
+            }
+        });
+
+        postDataButton.addEventListener("click", async () => {
+            try {
+                const name = nameInput.value;
+                const response = await fetch("/service/name", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name
+                    })
+                });
+
+                if (response.status === 200) {
+                    alert("Engineer name set successfully!");
+                } else {
+                    alert("Failed to set engineer name.");
+                }
+            } catch (error) {
+                alert("Error occurred: " + error.message);
+            }
+        });
+    </script>
+</body>
+</html>

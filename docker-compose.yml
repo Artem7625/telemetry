@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    image: cpilot-app-test-1:latest  # Образ FastAPI приложения
+    ports:
+      - "8082:8082"  # Перенаправление порта для FastAPI
+    environment:
+      - REDIS_HOST=udp-server  # Хост для подключения к Redis
+    depends_on:
+      - udp-server  # Это гарантирует, что Redis будет запущен перед FastAPI
+
+  udp-server:
+    image: goldarte/cpilot-testbox:latest  # Образ UDP сервера
+    ports:
+      - "5555:5555/udp"  # Перенаправление порта для UDP сервера
