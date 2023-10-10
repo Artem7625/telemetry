@@ -1,22 +1,31 @@
+import asyncio
+
 from modules.enet_wrapper import EnetClient, AgroProto, Data, get_property_name
 from agroproto.data.ImageFormat import ImageFormat
 
 
 class EnetHandler:
+    """Класс взаимодействия с Enet-сервером."""
+
     def __init__(self):
         self.enet_client = EnetClient()
 
-    def connect(self, host, port):
-        return self.enet_client.connect(host, port)
+    async def connect(self, host, port):
+        """Подключается к серверу."""
+        return await asyncio.to_thread(self.enet_client.connect, host, port)
 
-    def receive_data(self):
-        message = self.enet_client.receive_message()
+    async def receive_data(self):
+        """Асинхронно получает данные с сервера."""
+
+        message = await asyncio.to_thread(self.enet_client.receive_message)
         if message is not None:
             parsed_data = AgroProto.parse_message(message)
             return parsed_data
         return None
 
-    def process_data(self, parsed_data):
+    async def process_data(self, parsed_data):
+        """Асинхронно обрабатывает данные, полученные с сервера."""
+
         if parsed_data is not None:
             if parsed_data.type == Data.CommonInfo:
                 return self.process_common_info(parsed_data.data)
@@ -25,12 +34,16 @@ class EnetHandler:
         return None
 
     def process_common_info(self, data):
+        """Обрабатывает данные об общей информации."""
+
         return {
             "cte": data.cte,
             "speed": data.speed
         }
 
     def process_view(self, data):
+        """Обрабатывает данные изображения."""
+
         image = data.image
         image_format = get_property_name(ImageFormat, image.format)
         if image_format == "Jpeg":

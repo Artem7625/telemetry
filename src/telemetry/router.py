@@ -1,5 +1,3 @@
-from typing import Annotated
-
 from fastapi import APIRouter, Request, WebSocket
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -24,11 +22,16 @@ async def get_streaming_data(websocket: WebSocket):
     await websocket.accept()
 
     enet_handler = EnetHandler()
-    if enet_handler.connect("localhost", 5555):
+
+    # Проверка подключения к серверу.
+    if await enet_handler.connect("localhost", 5555):
         while True:
-            parsed_data = enet_handler.receive_data()
+            # Получение данных.
+            parsed_data = await enet_handler.receive_data()
             if parsed_data is not None:
-                data = enet_handler.process_data(parsed_data)
+                data = await enet_handler.process_data(parsed_data)
+
+                # Отправка полученных данных через сокет.
                 if data is not None:
                     if isinstance(data, dict):
                         await websocket.send_json(data)
