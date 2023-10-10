@@ -7,7 +7,7 @@ r = redis.Redis(host="localhost", port=6379, db=4)
 
 
 def get_service_data():
-    """Gets service data from Redis database"""
+    """Получает сервисные данные из базы данных Redis."""
 
     service_data = {}
 
@@ -27,6 +27,7 @@ def get_service_data():
 
 
 def set_engineer_name(name: str):
+    """Устанавливает значение по определенному ключу."""
     r.set("comissioning:engineer", name)
 
 
