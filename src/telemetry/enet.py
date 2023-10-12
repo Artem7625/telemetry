@@ -11,11 +11,15 @@ class EnetHandler:
         self.enet_client = EnetClient()
 
     async def connect(self, host, port):
-        """Подключается к серверу."""
+        """Подключается к Enet-серверу."""
         return await asyncio.to_thread(self.enet_client.connect, host, port)
 
+    async def disconnect(self):
+        """Разрывает соединение с Enet-сервером."""
+        await asyncio.to_thread(self.enet_client.disconnect)
+
     async def receive_data(self):
-        """Асинхронно получает данные с сервера."""
+        """Асинхронно получает данные с Enet-сервера."""
 
         message = await asyncio.to_thread(self.enet_client.receive_message)
         if message is not None:
@@ -24,7 +28,7 @@ class EnetHandler:
         return None
 
     async def process_data(self, parsed_data):
-        """Асинхронно обрабатывает данные, полученные с сервера."""
+        """Асинхронно обрабатывает данные, полученные с Enet-сервера."""
 
         if parsed_data is not None:
             if parsed_data.type == Data.CommonInfo:
@@ -38,7 +42,7 @@ class EnetHandler:
 
         return {
             "cte": data.cte,
-            "speed": data.speed
+            "speed": data.speed,
         }
 
     def process_view(self, data):
